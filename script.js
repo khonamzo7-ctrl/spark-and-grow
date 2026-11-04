@@ -34,9 +34,19 @@ document.getElementById('quote-form').addEventListener('submit',e=>{
   const email=document.getElementById('email-enquiry');
   if(SITE_CONFIG.businessEmail){email.href=`mailto:${SITE_CONFIG.businessEmail}?subject=${subject}&body=${body}`;email.hidden=false;}else{email.hidden=true;}
   const wa=document.getElementById('wa-enquiry');
-  if(SITE_CONFIG.whatsappNumber){wa.href=`https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${body}`;wa.hidden=false;}else{wa.hidden=true;}
+  wa.href=SITE_CONFIG.whatsappNumber ? `https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${body}` : `https://api.whatsapp.com/send?text=${body}`;
+  wa.textContent=SITE_CONFIG.whatsappNumber ? 'Send to Spark & Grow on WhatsApp' : 'Share via WhatsApp (choose recipient)';
+  wa.hidden=false;
   result.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 document.getElementById('copy-enquiry').addEventListener('click',async e=>{
   try{await navigator.clipboard.writeText(preparedMessage);e.currentTarget.textContent='Copied ✓';setTimeout(()=>e.currentTarget.textContent='Copy message',2500);}catch{window.prompt('Copy your enquiry message:',preparedMessage);}
+});
+document.getElementById('download-enquiry').addEventListener('click',()=>{
+  if(!preparedMessage)return;
+  const blob=new Blob([preparedMessage+'\n'],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='spark-and-grow-enquiry.txt';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
